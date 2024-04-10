@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OS and Browser Tags</title>
+    <script>
+        function getTags(os, browser) {
+            // Map of OS and browser combinations to tags
+            const tagMap = {
+                'Microsoft Windows': {
+                    'Edge': ['Microsoft Windows', 'Edge'],
+                    'Chrome': ['Microsoft Windows', 'Chrome'],
+                    'Firefox': ['Microsoft Windows', 'Firefox'],
+                    '*': ['Microsoft Windows', '*']
+                },
+                'Apple Mac': {
+                    'Safari': ['Apple Mac', 'Safari'],
+                    'Chrome': ['Apple Mac', 'Chrome'],
+                    'Firefox': ['Apple Mac', 'Firefox'],
+                    '*': ['Apple Mac', '*']
+                },
+                'Android': {
+                    'Chrome': ['Android', 'Chrome'],
+                    '*': ['Android', '*']
+                },
+                'Linux': {
+                    'Chrome': ['Linux', 'Chrome'],
+                    'Firefox': ['Linux', 'Firefox'],
+                    '*': ['Linux', '*']
+                },
+                'iPad': ['iPad'],
+                'iPhone': ['iPhone'],
+                'Windows 7': ['Microsoft Windows', 'Windows 7'],
+                'Windows 8': ['Microsoft Windows', 'Windows 8'],
+                'Windows 10': ['Microsoft Windows', 'Windows 10']
+            };
+
+            // Check if the combination of OS and browser exists in the tag map
+            if (tagMap[os] && tagMap[os][browser]) {
+                return tagMap[os][browser];
+            } else if (tagMap[os] && tagMap[os]['*']) {
+                return tagMap[os]['*'];
+            } else {
+                return ['*']; // Default tag if no valid combination is found
+            }
+        }
+
+        function getTagsAndDisplay() {
+            const os = getOS();
+            const browser = getBrowser();
+            const tags = getTags(os, browser);
+            document.getElementById('tags').innerText = tags.join(', ');
+        }
+
+        function getOS() {
+            const userAgent = window.navigator.userAgent;
+            const platform = window.navigator.platform;
+            const macPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
+
+            if (macPlatforms.indexOf(platform) !== -1) {
+                return 'Apple Mac';
+            } else if (platform === 'Linux' && !userAgent.includes('Android')) {
+                return 'Linux';
+            } else if (platform === 'iPhone' || platform === 'iPad' || platform === 'iPod') {
+                return platform;
+            } else if (platform === 'Win32' || platform === 'Win64' || platform === 'Windows') {
+                return 'Microsoft Windows';
+            } else {
+                return platform;
+            }
+        }
+
+        function getBrowser() {
+            const userAgent = window.navigator.userAgent;
+            if (userAgent.indexOf('Firefox') !== -1) {
+                return 'Firefox';
+            } else if (userAgent.indexOf('Chrome') !== -1 || userAgent.indexOf('CriOS') !== -1) {
+                return 'Chrome';
+            } else if (userAgent.indexOf('Safari') !== -1) {
+                return 'Safari';
+            } else if (userAgent.indexOf('MSIE') !== -1 || userAgent.indexOf('Trident/') !== -1) {
+                return 'IE';
+            } else {
+                return 'Unknown';
+            }
+        }
+    </script>
+</head>
+<body onload="getTagsAndDisplay()">
+<h1>OS and Browser Tags</h1>
+<p><strong>Tags:</strong> <span id="tags"></span></p>
+</body>
+</html>
