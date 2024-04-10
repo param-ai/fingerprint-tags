@@ -1,94 +1,113 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OS and Browser Tags</title>
-    <script>
-        function getTags(os, browser) {
-            // Map of OS and browser combinations to tags
-            const tagMap = {
-                'Microsoft Windows': {
-                    'Edge': ['Microsoft Windows', 'Edge'],
-                    'Chrome': ['Microsoft Windows', 'Chrome'],
-                    'Firefox': ['Microsoft Windows', 'Firefox'],
-                    '*': ['Microsoft Windows', '*']
-                },
-                'Apple Mac': {
-                    'Safari': ['Apple Mac', 'Safari'],
-                    'Chrome': ['Apple Mac', 'Chrome'],
-                    'Firefox': ['Apple Mac', 'Firefox'],
-                    '*': ['Apple Mac', '*']
-                },
-                'Android': {
-                    'Chrome': ['Android', 'Chrome'],
-                    '*': ['Android', '*']
-                },
-                'Linux': {
-                    'Chrome': ['Linux', 'Chrome'],
-                    'Firefox': ['Linux', 'Firefox'],
-                    '*': ['Linux', '*']
-                },
-                'iPad': ['iPad'],
-                'iPhone': ['iPhone'],
-                'Windows 7': ['Microsoft Windows', 'Windows 7'],
-                'Windows 8': ['Microsoft Windows', 'Windows 8'],
-                'Windows 10': ['Microsoft Windows', 'Windows 10']
-            };
+  </head>
+  <body onload="detectBrowserAndOs()">
+    <h1>User OS and Browser</h1>
+    <p>
+        <strong>User agent:</strong>
+        <span id="useragent"></span>
+    </p>
+    <p>
+        <strong>Platform:</strong>
+        <span id="platform"></span>
+    </p>
 
-            // Check if the combination of OS and browser exists in the tag map
-            if (tagMap[os] && tagMap[os][browser]) {
-                return tagMap[os][browser];
-            } else if (tagMap[os] && tagMap[os]['*']) {
-                return tagMap[os]['*'];
-            } else {
-                return ['*']; // Default tag if no valid combination is found
-            }
+    <p>
+      <strong>OS:</strong>
+      <span id="os"></span>
+    </p>
+    <p>
+      <strong>Browser:</strong>
+      <span id="browser"></span>
+    </p>
+
+    <p style="color: red">
+      <strong>Tags:</strong>
+      <span id="tags"></span>
+    </p>
+
+
+  </body>
+  <script>
+    function detectBrowserAndOs() {
+      const userAgent = window.navigator.userAgent;
+      const platform = window.navigator.platform;
+
+      //detect the user's operating system
+      let macosPlatforms = ["Macintosh", "MacIntel", "MacPPC", "Mac68K"],
+        windowsPlatforms = ["Win32", "Win64", "Windows", "WinCE"],
+        iosPlatforms = ["iPhone", "iPad", "iPod"],
+        os = null;
+
+      if (macosPlatforms.indexOf(platform) !== -1) {
+        os = "Apple Mac";
+      } else if (iosPlatforms.indexOf(platform) !== -1) {
+        os = "iOS";
+      } else if (windowsPlatforms.indexOf(platform) !== -1) {
+        os = "Microsoft Windows";
+      } else if (/Android/.test(userAgent)) {
+        os = "Android";
+      } else if (/Linux/.test(platform)) {
+        os = "Linux";
+      }
+
+      // detect the user's browser
+      let browsers = ["Chrome", "Firefox", "Edge", "Safari"],
+        browser = "Unknown";
+
+      for (let i = 0; i < browsers.length; i++) {
+        if (userAgent.indexOf(browsers[i]) > -1) {
+          browser = browsers[i];
+          break;
         }
+      }
 
-        function getTagsAndDisplay() {
-            const os = getOS();
-            const browser = getBrowser();
-            const tags = getTags(os, browser);
-            document.getElementById('tags').innerText = tags.join(', ');
+      // Get tags based on detected OS and browser
+      const tags = getTags(os, browser);
+
+      document.getElementById("tags").innerText = tags.join(", ");
+      document.getElementById("os").innerText = os;
+      document.getElementById("browser").innerText = browser;
+      document.getElementById("useragent").innerText = userAgent;
+      document.getElementById("platform").innerText = platform;
+    }
+    function getTags(os, browser) {
+      if (os.toLowerCase().includes("apple mac")) {
+        if (browser.toLowerCase() === "edge") {
+          return ["Apple Mac", "Edge"];
+        } else if (browser.toLowerCase() === "safari") {
+          return ["Apple Mac", "Safari"];
+        } else if (browser.toLowerCase() === "firefox") {
+          return ["Apple Mac", "Firefox"];
+        } else {
+          return ["Apple Mac", "Chrome"];
         }
-
-        function getOS() {
-            const userAgent = window.navigator.userAgent;
-            const platform = window.navigator.platform;
-            const macPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
-
-            if (macPlatforms.indexOf(platform) !== -1) {
-                return 'Apple Mac';
-            } else if (platform === 'Linux' && !userAgent.includes('Android')) {
-                return 'Linux';
-            } else if (platform === 'iPhone' || platform === 'iPad' || platform === 'iPod') {
-                return platform;
-            } else if (platform === 'Win32' || platform === 'Win64' || platform === 'Windows') {
-                return 'Microsoft Windows';
-            } else {
-                return platform;
-            }
+      } else if (
+        os.toLowerCase().includes("microsoft windows") ||
+        os.toLowerCase().includes("windows 7") ||
+        os.toLowerCase().includes("windows 8") ||
+        os.toLowerCase().includes("windows 10")
+      ) {
+        if (browser.toLowerCase() === "edge") {
+          return ["Microsoft Windows", "Edge"];
+        } else if (browser.toLowerCase() === "firefox") {
+          return ["Microsoft Windows", "Firefox"];
+        } else {
+          return ["Microsoft Windows", "Chrome"];
         }
-
-        function getBrowser() {
-            const userAgent = window.navigator.userAgent;
-            if (userAgent.indexOf('Firefox') !== -1) {
-                return 'Firefox';
-            } else if (userAgent.indexOf('Chrome') !== -1 || userAgent.indexOf('CriOS') !== -1) {
-                return 'Chrome';
-            } else if (userAgent.indexOf('Safari') !== -1) {
-                return 'Safari';
-            } else if (userAgent.indexOf('MSIE') !== -1 || userAgent.indexOf('Trident/') !== -1) {
-                return 'IE';
-            } else {
-                return 'Unknown';
-            }
+      } else if (os.toLowerCase().includes("linux")) {
+        if (browser.toLowerCase() === "firefox") {
+          return ["Linux", "Firefox"];
+        } else {
+          return ["Linux", "Chrome"];
         }
-    </script>
-</head>
-<body onload="getTagsAndDisplay()">
-<h1>OS and Browser Tags</h1>
-<p><strong>Tags:</strong> <span id="tags"></span></p>
-</body>
+      } else {
+        return ["Microsoft Windows", "Chrome"];
+      }
+    }
+  </script>
 </html>
